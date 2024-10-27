@@ -42,6 +42,12 @@ async function run() {
       const result = await BannersCollection.find().toArray();
       res.send(result);
     });
+     // Post Home Banners
+     app.post("/Banners", async (req, res) => {
+      const request = req.body;
+      const result = await BannersCollection.insertOne(request);
+      res.send(result);
+    });
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
