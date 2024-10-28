@@ -37,6 +37,11 @@ async function run() {
     const CampusCollection = client.db("SIPI").collection("Campus");
     const DepartmentCollection = client.db("SIPI").collection("Department");
     const ManagementCollection = client.db("SIPI").collection("Management");
+    const TeachersCollection = client.db("SIPI").collection("Teachers");
+    const GuestTestimonialsCollection = client
+      .db("SIPI")
+      .collection("Guest-Testimonials");
+    const NoticesCollection = client.db("SIPI").collection("Notices");
 
     // Fetch Request
 
@@ -107,6 +112,48 @@ async function run() {
     app.post("/Management", async (req, res) => {
       const request = req.body;
       const result = await ManagementCollection.insertOne(request);
+      res.send(result);
+    });
+
+    // Teachers API
+    // Get Teachers
+    app.get("/Teachers", async (req, res) => {
+      const result = await TeachersCollection.find().toArray();
+      res.send(result);
+    });
+
+    // Post Teachers
+    app.post("/Teachers", async (req, res) => {
+      const request = req.body;
+      const result = await TeachersCollection.insertOne(request);
+      res.send(result);
+    });
+
+    // Guest Testimonials API
+    // Get Guest Testimonials
+    app.get("/Guest-Testimonials", async (req, res) => {
+      const result = await GuestTestimonialsCollection.find().toArray();
+      res.send(result);
+    });
+
+    // Post Guest Testimonials
+    app.post("/Guest-Testimonials", async (req, res) => {
+      const request = req.body;
+      const result = await GuestTestimonialsCollection.insertOne(request);
+      res.send(result);
+    });
+
+    // Notices API
+    // Get Notices
+    app.get("/Notices", async (req, res) => {
+      const result = await NoticesCollection.find().toArray();
+      res.send(result);
+    });
+
+    // Post Notices
+    app.post("/Notices", async (req, res) => {
+      const request = req.body;
+      const result = await NoticesCollection.insertOne(request);
       res.send(result);
     });
 
