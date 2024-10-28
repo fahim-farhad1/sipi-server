@@ -42,6 +42,9 @@ async function run() {
       .db("SIPI")
       .collection("Guest-Testimonials");
     const NoticesCollection = client.db("SIPI").collection("Notices");
+    const TestimonialsCollection = client.db("SIPI").collection("Testimonials");
+    const RoutineCollection = client.db("SIPI").collection("Routine");
+    const TuitionFeeCollection = client.db("SIPI").collection("Tuition-Fee");
 
     // Fetch Request
 
@@ -154,6 +157,105 @@ async function run() {
     app.post("/Notices", async (req, res) => {
       const request = req.body;
       const result = await NoticesCollection.insertOne(request);
+      res.send(result);
+    });
+
+    // Testimonials API
+    // Get Testimonials
+    app.get("/Testimonials", async (req, res) => {
+      const { department, position } = req.query; // Destructure query parameters
+
+      // Build query object based on provided parameters
+      const query = {};
+      if (department) {
+        query.department = department; // Filter by department if provided
+      }
+      if (position) {
+        query.position = position; // Filter by position if provided
+      }
+
+      try {
+        const result = await TestimonialsCollection.find(query).toArray(); // Query the collection
+        res.send(result); // Send the filtered results
+      } catch (error) {
+        console.error("Error fetching testimonials:", error);
+        res.status(500).send("Internal Server Error");
+      }
+    });
+
+    // Post Testimonials
+    app.post("/Testimonials", async (req, res) => {
+      const request = req.body;
+      const result = await TestimonialsCollection.insertOne(request);
+      res.send(result);
+    });
+
+    // Routine API
+    // Get Routine
+    app.get("/Routine", async (req, res) => {
+      const { session, semester, department } = req.query;
+
+      // Create a filter object based on the provided query parameters
+      const filter = {};
+
+      if (session) {
+        filter.session = session;
+      }
+      if (semester) {
+        // Convert semester to a number
+        filter.semester = parseInt(semester, 10); // Parse semester as an integer
+      }
+      if (department) {
+        filter.department = department;
+      }
+
+      try {
+        // Find routines based on the filter
+        const result = await RoutineCollection.find(filter).toArray();
+        res.send(result);
+      } catch (error) {
+        res.status(500).send({ message: "Error retrieving routines", error });
+      }
+    });
+
+    // Post Routine
+    app.post("/Routine", async (req, res) => {
+      const request = req.body;
+      const result = await RoutineCollection.insertOne(request);
+      res.send(result);
+    });
+
+    // Tuition Fee API
+    // Get Tuition Fee
+    app.get("/Tuition-Fee", async (req, res) => {
+      const { semester, department, session } = req.query;
+
+      // Build a dynamic filter object based on the provided query parameters
+      const filter = {};
+      if (semester) {
+        filter.semester = parseInt(semester, 10); // Ensure semester is stored as a number
+      }
+      if (department) {
+        filter.department = department;
+      }
+      if (session) {
+        filter.session = session;
+      }
+
+      try {
+        const result = await TuitionFeeCollection.find(filter).toArray();
+        res.send(result);
+      } catch (error) {
+        res
+          .status(500)
+          .send({ message: "Error retrieving tuition fees", error });
+      }
+    });
+
+    // Post Tuition Fee
+    app.post("/Tuition-Fee", async (req, res) => {
+      const request = req.body;
+      const result = await TuitionFeeCollection.insertOne(request);
       res.send(result);
     });
 
