@@ -32,20 +32,81 @@ async function run() {
     await client.connect();
 
     // Collections
-    const BannersCollection = client.db("SIPI").collection("Banners");
+    const HomeBannersCollection = client.db("SIPI").collection("HomeBanner");
+    const AboutUSCollection = client.db("SIPI").collection("AboutUS");
+    const CampusCollection = client.db("SIPI").collection("Campus");
+    const DepartmentCollection = client.db("SIPI").collection("Department");
+    const ManagementCollection = client.db("SIPI").collection("Management");
 
     // Fetch Request
 
-    // Banner API
-    // Get Banner
-    app.get("/Banners", async (req, res) => {
-      const result = await BannersCollection.find().toArray();
+    // Home Banner API
+    // Get Home Banner
+    app.get("/HomeBanners", async (req, res) => {
+      const result = await HomeBannersCollection.find().toArray();
       res.send(result);
     });
-     // Post Home Banners
-     app.post("/Banners", async (req, res) => {
+
+    // Post Home Home Banner
+    app.post("/HomeBanner", async (req, res) => {
       const request = req.body;
-      const result = await BannersCollection.insertOne(request);
+      const result = await HomeBannersCollection.insertOne(request);
+      res.send(result);
+    });
+
+    // About US API
+    // Get About US
+    app.get("/AboutUS", async (req, res) => {
+      const result = await AboutUSCollection.find().toArray();
+      res.send(result);
+    });
+
+    // Post Home About US
+    app.post("/AboutUS", async (req, res) => {
+      const request = req.body;
+      const result = await AboutUSCollection.insertOne(request);
+      res.send(result);
+    });
+
+    // Campus API
+    // Get Campus
+    app.get("/Campus", async (req, res) => {
+      const result = await CampusCollection.find().toArray();
+      res.send(result);
+    });
+
+    // Post Campus
+    app.post("/Campus", async (req, res) => {
+      const request = req.body;
+      const result = await CampusCollection.insertOne(request);
+      res.send(result);
+    });
+
+    // Department API
+    // Get Department
+    app.get("/Department", async (req, res) => {
+      const result = await DepartmentCollection.find().toArray();
+      res.send(result);
+    });
+
+    // Post Department
+    app.post("/Department", async (req, res) => {
+      const request = req.body;
+      const result = await DepartmentCollection.insertOne(request);
+      res.send(result);
+    });
+
+    // Management API
+    // Get Management
+    app.get("/Management", async (req, res) => {
+      const result = await ManagementCollection.find().toArray();
+      res.send(result);
+    });
+
+    // Post Management
+    app.post("/Management", async (req, res) => {
+      const request = req.body;
+      const result = await ManagementCollection.insertOne(request);
       res.send(result);
     });
 
