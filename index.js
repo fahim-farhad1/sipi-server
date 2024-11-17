@@ -29,7 +29,7 @@ const client = new MongoClient(uri, {
 async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
-    await client.connect();
+    // await client.connect();
 
     // Collections
     const HomeBannersCollection = client.db("SIPI").collection("HomeBanner");
@@ -56,7 +56,7 @@ async function run() {
     });
 
     // Post Home Home Banner
-    app.post("/HomeBanner", async (req, res) => {
+    app.post("/HomeBanners", async (req, res) => {
       const request = req.body;
       const result = await HomeBannersCollection.insertOne(request);
       res.send(result);
@@ -91,10 +91,31 @@ async function run() {
     });
 
     // Department API
-    // Get Department
     app.get("/Department", async (req, res) => {
-      const result = await DepartmentCollection.find().toArray();
-      res.send(result);
+      const { departmentName } = req.query; // Extract departmentName from query parameters
+
+      try {
+        if (departmentName) {
+          // Query the department by departmentName if provided
+          const department = await DepartmentCollection.findOne({
+            departmentName: departmentName,
+          });
+
+          if (department) {
+            res.status(200).send(department); // If the department is found, return it
+          } else {
+            res.status(404).send({ message: "Department not found" }); // If the department does not exist
+          }
+        } else {
+          // If no departmentName is provided, return all departments
+          const departments = await DepartmentCollection.find().toArray();
+          res.status(200).send(departments);
+        }
+      } catch (error) {
+        res
+          .status(500)
+          .send({ message: "Error processing request", error: error.message });
+      }
     });
 
     // Post Department
@@ -130,6 +151,63 @@ async function run() {
       const request = req.body;
       const result = await TeachersCollection.insertOne(request);
       res.send(result);
+    });
+
+    // Update Teachers by ID
+    app.put("/Teachers/:id", async (req, res) => {
+      const id = req.params.id; // Get the job ID from the request parameters
+      const updatedData = req.body; // Data to update, sent from the client
+
+      // Construct the query to find the job by its ID
+      const query = { _id: new ObjectId(id) };
+
+      // Construct the update object with the updated job data
+      const update = {
+        $set: updatedData, // Use $set to update the fields in the job document
+      };
+
+      try {
+        // Perform the update in the database
+        const result = await TeachersCollection.updateOne(query, update);
+
+        // Check if the update was successful
+        if (result.modifiedCount > 0) {
+          res.status(200).send({ message: "Job updated successfully!" });
+        } else {
+          res
+            .status(404)
+            .send({ message: "Job not found or no changes made." });
+        }
+      } catch (error) {
+        console.error("Error updating the job:", error);
+        res.status(500).send({
+          message: "An error occurred while updating the job.",
+          error,
+        });
+      }
+    });
+
+    // Delete an Teachers by ID
+    app.delete("/Teachers/:id", async (req, res) => {
+      const id = req.params.id; // Get the event ID from the request parameters
+      const query = { _id: new ObjectId(id) }; // Construct the query to find the event by ID
+
+      try {
+        // Delete the event document from the collection
+        const result = await TeachersCollection.deleteOne(query);
+
+        // Check if the event was deleted
+        if (result.deletedCount > 0) {
+          res.status(200).send({ message: "Event deleted successfully!" });
+        } else {
+          res
+            .status(404)
+            .send({ message: "Event not found or already deleted." });
+        }
+      } catch (error) {
+        console.error("Error deleting the event:", error);
+        res.status(500).send({ message: "Error deleting the event", error });
+      }
     });
 
     // Guest Testimonials API
