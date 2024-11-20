@@ -45,6 +45,7 @@ async function run() {
     const TestimonialsCollection = client.db("SIPI").collection("Testimonials");
     const RoutineCollection = client.db("SIPI").collection("Routine");
     const TuitionFeeCollection = client.db("SIPI").collection("Tuition-Fee");
+    const BlogsCollection = client.db("SIPI").collection("Blogs");
 
     // Fetch Request
 
@@ -90,6 +91,63 @@ async function run() {
       res.send(result);
     });
 
+    // Update Campus by ID
+    app.put("/Campus/:id", async (req, res) => {
+      const id = req.params.id; // Get the job ID from the request parameters
+      const updatedData = req.body; // Data to update, sent from the client
+
+      // Construct the query to find the job by its ID
+      const query = { _id: new ObjectId(id) };
+
+      // Construct the update object with the updated job data
+      const update = {
+        $set: updatedData, // Use $set to update the fields in the job document
+      };
+
+      try {
+        // Perform the update in the database
+        const result = await CampusCollection.updateOne(query, update);
+
+        // Check if the update was successful
+        if (result.modifiedCount > 0) {
+          res.status(200).send({ message: "Job updated successfully!" });
+        } else {
+          res
+            .status(404)
+            .send({ message: "Job not found or no changes made." });
+        }
+      } catch (error) {
+        console.error("Error updating the job:", error);
+        res.status(500).send({
+          message: "An error occurred while updating the job.",
+          error,
+        });
+      }
+    });
+
+    // Delete an Campus by ID
+    app.delete("/Campus/:id", async (req, res) => {
+      const id = req.params.id; // Get the event ID from the request parameters
+      const query = { _id: new ObjectId(id) }; // Construct the query to find the event by ID
+
+      try {
+        // Delete the event document from the collection
+        const result = await CampusCollection.deleteOne(query);
+
+        // Check if the event was deleted
+        if (result.deletedCount > 0) {
+          res.status(200).send({ message: "Event deleted successfully!" });
+        } else {
+          res
+            .status(404)
+            .send({ message: "Event not found or already deleted." });
+        }
+      } catch (error) {
+        console.error("Error deleting the event:", error);
+        res.status(500).send({ message: "Error deleting the event", error });
+      }
+    });
+
     // Department API
     app.get("/Department", async (req, res) => {
       const { departmentName } = req.query; // Extract departmentName from query parameters
@@ -117,12 +175,90 @@ async function run() {
           .send({ message: "Error processing request", error: error.message });
       }
     });
+    // New API to fetch all department names
+    app.get("/DepartmentNames", async (req, res) => {
+      try {
+        // Query to get all departments but only select the departmentName field
+        const departments = await DepartmentCollection.find(
+          {},
+          { projection: { departmentName: 1, _id: 0 } }
+        ).toArray();
+
+        // Extract department names into an array
+        const departmentNames = departments.map(
+          (department) => department.departmentName
+        );
+
+        res.status(200).send(departmentNames); // Send the array of department names as the response
+      } catch (error) {
+        res
+          .status(500)
+          .send({ message: "Error processing request", error: error.message });
+      }
+    });
 
     // Post Department
     app.post("/Department", async (req, res) => {
       const request = req.body;
       const result = await DepartmentCollection.insertOne(request);
       res.send(result);
+    });
+
+    // Update Department by ID
+    app.put("/Department/:id", async (req, res) => {
+      const id = req.params.id; // Get the job ID from the request parameters
+      const updatedData = req.body; // Data to update, sent from the client
+
+      // Construct the query to find the job by its ID
+      const query = { _id: new ObjectId(id) };
+
+      // Construct the update object with the updated job data
+      const update = {
+        $set: updatedData, // Use $set to update the fields in the job document
+      };
+
+      try {
+        // Perform the update in the database
+        const result = await DepartmentCollection.updateOne(query, update);
+
+        // Check if the update was successful
+        if (result.modifiedCount > 0) {
+          res.status(200).send({ message: "Job updated successfully!" });
+        } else {
+          res
+            .status(404)
+            .send({ message: "Job not found or no changes made." });
+        }
+      } catch (error) {
+        console.error("Error updating the job:", error);
+        res.status(500).send({
+          message: "An error occurred while updating the job.",
+          error,
+        });
+      }
+    });
+
+    // Delete an Department by ID
+    app.delete("/Department/:id", async (req, res) => {
+      const id = req.params.id; // Get the event ID from the request parameters
+      const query = { _id: new ObjectId(id) }; // Construct the query to find the event by ID
+
+      try {
+        // Delete the event document from the collection
+        const result = await DepartmentCollection.deleteOne(query);
+
+        // Check if the event was deleted
+        if (result.deletedCount > 0) {
+          res.status(200).send({ message: "Event deleted successfully!" });
+        } else {
+          res
+            .status(404)
+            .send({ message: "Event not found or already deleted." });
+        }
+      } catch (error) {
+        console.error("Error deleting the event:", error);
+        res.status(500).send({ message: "Error deleting the event", error });
+      }
     });
 
     // Management API
@@ -269,16 +405,76 @@ async function run() {
 
     // Guest Testimonials API
     // Get Guest Testimonials
-    app.get("/Guest-Testimonials", async (req, res) => {
+    app.get("/GuestTestimonials", async (req, res) => {
       const result = await GuestTestimonialsCollection.find().toArray();
       res.send(result);
     });
 
     // Post Guest Testimonials
-    app.post("/Guest-Testimonials", async (req, res) => {
+    app.post("/GuestTestimonials", async (req, res) => {
       const request = req.body;
       const result = await GuestTestimonialsCollection.insertOne(request);
       res.send(result);
+    });
+
+    // Update GuestTestimonials by ID
+    app.put("/GuestTestimonials/:id", async (req, res) => {
+      const id = req.params.id; // Get the job ID from the request parameters
+      const updatedData = req.body; // Data to update, sent from the client
+
+      // Construct the query to find the job by its ID
+      const query = { _id: new ObjectId(id) };
+
+      // Construct the update object with the updated job data
+      const update = {
+        $set: updatedData, // Use $set to update the fields in the job document
+      };
+
+      try {
+        // Perform the update in the database
+        const result = await GuestTestimonialsCollection.updateOne(
+          query,
+          update
+        );
+
+        // Check if the update was successful
+        if (result.modifiedCount > 0) {
+          res.status(200).send({ message: "Job updated successfully!" });
+        } else {
+          res
+            .status(404)
+            .send({ message: "Job not found or no changes made." });
+        }
+      } catch (error) {
+        console.error("Error updating the job:", error);
+        res.status(500).send({
+          message: "An error occurred while updating the job.",
+          error,
+        });
+      }
+    });
+
+    // Delete an GuestTestimonials by ID
+    app.delete("/GuestTestimonials/:id", async (req, res) => {
+      const id = req.params.id; // Get the event ID from the request parameters
+      const query = { _id: new ObjectId(id) }; // Construct the query to find the event by ID
+
+      try {
+        // Delete the event document from the collection
+        const result = await GuestTestimonialsCollection.deleteOne(query);
+
+        // Check if the event was deleted
+        if (result.deletedCount > 0) {
+          res.status(200).send({ message: "Event deleted successfully!" });
+        } else {
+          res
+            .status(404)
+            .send({ message: "Event not found or already deleted." });
+        }
+      } catch (error) {
+        console.error("Error deleting the event:", error);
+        res.status(500).send({ message: "Error deleting the event", error });
+      }
     });
 
     // Notices API
@@ -382,6 +578,63 @@ async function run() {
       res.send(result);
     });
 
+    // Update Notices by ID
+    app.put("/Testimonials/:id", async (req, res) => {
+      const id = req.params.id; // Get the job ID from the request parameters
+      const updatedData = req.body; // Data to update, sent from the client
+
+      // Construct the query to find the job by its ID
+      const query = { _id: new ObjectId(id) };
+
+      // Construct the update object with the updated job data
+      const update = {
+        $set: updatedData, // Use $set to update the fields in the job document
+      };
+
+      try {
+        // Perform the update in the database
+        const result = await TestimonialsCollection.updateOne(query, update);
+
+        // Check if the update was successful
+        if (result.modifiedCount > 0) {
+          res.status(200).send({ message: "Job updated successfully!" });
+        } else {
+          res
+            .status(404)
+            .send({ message: "Job not found or no changes made." });
+        }
+      } catch (error) {
+        console.error("Error updating the job:", error);
+        res.status(500).send({
+          message: "An error occurred while updating the job.",
+          error,
+        });
+      }
+    });
+
+    // Delete an Testimonials by ID
+    app.delete("/Testimonials/:id", async (req, res) => {
+      const id = req.params.id; // Get the event ID from the request parameters
+      const query = { _id: new ObjectId(id) }; // Construct the query to find the event by ID
+
+      try {
+        // Delete the event document from the collection
+        const result = await TestimonialsCollection.deleteOne(query);
+
+        // Check if the event was deleted
+        if (result.deletedCount > 0) {
+          res.status(200).send({ message: "Event deleted successfully!" });
+        } else {
+          res
+            .status(404)
+            .send({ message: "Event not found or already deleted." });
+        }
+      } catch (error) {
+        console.error("Error deleting the event:", error);
+        res.status(500).send({ message: "Error deleting the event", error });
+      }
+    });
+
     // Routine API
     // Get Routine
     app.get("/Routine", async (req, res) => {
@@ -415,6 +668,63 @@ async function run() {
       const request = req.body;
       const result = await RoutineCollection.insertOne(request);
       res.send(result);
+    });
+
+    // Update Routine by ID
+    app.put("/Routine/:id", async (req, res) => {
+      const id = req.params.id; // Get the job ID from the request parameters
+      const updatedData = req.body; // Data to update, sent from the client
+
+      // Construct the query to find the job by its ID
+      const query = { _id: new ObjectId(id) };
+
+      // Construct the update object with the updated job data
+      const update = {
+        $set: updatedData, // Use $set to update the fields in the job document
+      };
+
+      try {
+        // Perform the update in the database
+        const result = await RoutineCollection.updateOne(query, update);
+
+        // Check if the update was successful
+        if (result.modifiedCount > 0) {
+          res.status(200).send({ message: "Job updated successfully!" });
+        } else {
+          res
+            .status(404)
+            .send({ message: "Job not found or no changes made." });
+        }
+      } catch (error) {
+        console.error("Error updating the job:", error);
+        res.status(500).send({
+          message: "An error occurred while updating the job.",
+          error,
+        });
+      }
+    });
+
+    // Delete an Routine by ID
+    app.delete("/Routine/:id", async (req, res) => {
+      const id = req.params.id; // Get the event ID from the request parameters
+      const query = { _id: new ObjectId(id) }; // Construct the query to find the event by ID
+
+      try {
+        // Delete the event document from the collection
+        const result = await RoutineCollection.deleteOne(query);
+
+        // Check if the event was deleted
+        if (result.deletedCount > 0) {
+          res.status(200).send({ message: "Event deleted successfully!" });
+        } else {
+          res
+            .status(404)
+            .send({ message: "Event not found or already deleted." });
+        }
+      } catch (error) {
+        console.error("Error deleting the event:", error);
+        res.status(500).send({ message: "Error deleting the event", error });
+      }
     });
 
     // Tuition Fee API
@@ -493,6 +803,77 @@ async function run() {
       try {
         // Delete the event document from the collection
         const result = await TuitionFeeCollection.deleteOne(query);
+
+        // Check if the event was deleted
+        if (result.deletedCount > 0) {
+          res.status(200).send({ message: "Event deleted successfully!" });
+        } else {
+          res
+            .status(404)
+            .send({ message: "Event not found or already deleted." });
+        }
+      } catch (error) {
+        console.error("Error deleting the event:", error);
+        res.status(500).send({ message: "Error deleting the event", error });
+      }
+    });
+
+    // Blogs API
+    // Get Blogs
+    app.get("/Blogs", async (req, res) => {
+      const result = await BlogsCollection.find().toArray();
+      res.send(result);
+    });
+
+    // Post Blogs
+    app.post("/Blogs", async (req, res) => {
+      const request = req.body;
+      const result = await BlogsCollection.insertOne(request);
+      res.send(result);
+    });
+
+    // Update Blogs by ID
+    app.put("/Blogs/:id", async (req, res) => {
+      const id = req.params.id; // Get the job ID from the request parameters
+      const updatedData = req.body; // Data to update, sent from the client
+
+      // Construct the query to find the job by its ID
+      const query = { _id: new ObjectId(id) };
+
+      // Construct the update object with the updated job data
+      const update = {
+        $set: updatedData, // Use $set to update the fields in the job document
+      };
+
+      try {
+        // Perform the update in the database
+        const result = await BlogsCollection.updateOne(query, update);
+
+        // Check if the update was successful
+        if (result.modifiedCount > 0) {
+          res.status(200).send({ message: "Job updated successfully!" });
+        } else {
+          res
+            .status(404)
+            .send({ message: "Job not found or no changes made." });
+        }
+      } catch (error) {
+        console.error("Error updating the job:", error);
+        res.status(500).send({
+          message: "An error occurred while updating the job.",
+          error,
+        });
+      }
+    });
+
+    // Delete an Blogs by ID
+    app.delete("/Blogs/:id", async (req, res) => {
+      const id = req.params.id; // Get the event ID from the request parameters
+      const query = { _id: new ObjectId(id) }; // Construct the query to find the event by ID
+
+      try {
+        // Delete the event document from the collection
+        const result = await BlogsCollection.deleteOne(query);
 
         // Check if the event was deleted
         if (result.deletedCount > 0) {
