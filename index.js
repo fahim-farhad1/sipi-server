@@ -46,6 +46,7 @@ async function run() {
     const RoutineCollection = client.db("SIPI").collection("Routine");
     const TuitionFeeCollection = client.db("SIPI").collection("Tuition-Fee");
     const BlogsCollection = client.db("SIPI").collection("Blogs");
+    const ApplicantCollection = client.db("SIPI").collection("Applicant");
 
     // Fetch Request
 
@@ -825,6 +826,22 @@ async function run() {
       res.send(result);
     });
 
+    // Get a blog by ID
+    app.get("/Blogs/:id", async (req, res) => {
+      const id = req.params.id; // Get the id from the request parameters
+      try {
+        const objectId = new ObjectId(id); // Convert the id string to a MongoDB ObjectId
+        const result = await BlogsCollection.findOne({ _id: objectId }); // Query the collection
+        if (result) {
+          res.send(result); // Send the blog data as a response
+        } else {
+          res.status(404).send({ message: "Blog not found" }); // Blog not found
+        }
+      } catch (error) {
+        res.status(500).send({ message: "Error retrieving blog", error }); // Handle invalid id or other errors
+      }
+    });
+
     // Post Blogs
     app.post("/Blogs", async (req, res) => {
       const request = req.body;
@@ -874,6 +891,43 @@ async function run() {
       try {
         // Delete the event document from the collection
         const result = await BlogsCollection.deleteOne(query);
+
+        // Check if the event was deleted
+        if (result.deletedCount > 0) {
+          res.status(200).send({ message: "Event deleted successfully!" });
+        } else {
+          res
+            .status(404)
+            .send({ message: "Event not found or already deleted." });
+        }
+      } catch (error) {
+        console.error("Error deleting the event:", error);
+        res.status(500).send({ message: "Error deleting the event", error });
+      }
+    });
+
+    // Applicant API
+    // Get Applicant
+    app.get("/Applicant", async (req, res) => {
+      const result = await ApplicantCollection.find().toArray();
+      res.send(result);
+    });
+
+    // Post Applicant
+    app.post("/Applicant", async (req, res) => {
+      const request = req.body;
+      const result = await ApplicantCollection.insertOne(request);
+      res.send(result);
+    });
+
+    // Delete an Applicant by ID
+    app.delete("/Applicant/:id", async (req, res) => {
+      const id = req.params.id; // Get the event ID from the request parameters
+      const query = { _id: new ObjectId(id) }; // Construct the query to find the event by ID
+
+      try {
+        // Delete the event document from the collection
+        const result = await ApplicantCollection.deleteOne(query);
 
         // Check if the event was deleted
         if (result.deletedCount > 0) {
