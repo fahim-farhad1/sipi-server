@@ -8,7 +8,11 @@ const port = process.env.PORT || 5000;
 // Middle Ware
 app.use(
   cors({
-    origin: ["http://localhost:5173"],
+    origin: [
+      "http://localhost:5173",
+      "https://sipi-website-da327.firebaseapp.com",
+      "https://sipi-website-da327.web.app",
+    ],
     credentials: true,
   })
 );
